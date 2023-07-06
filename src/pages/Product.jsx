@@ -6,8 +6,7 @@ export default function Product() {
     console.log(prod);
     return (
         <div>
-            Product1 {prod && prod}
+            Product {prod && prod}
         </div>
     );
 }
-
