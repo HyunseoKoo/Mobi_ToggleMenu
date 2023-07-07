@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { styled } from 'styled-components';
 
 export default function Sidebar() {
+    const listRef = useRef({});
+    const {prod, user} = useParams();
     const [sideMenu, setSideMenu] = useState([
         {
             name: 'product',
@@ -19,26 +21,59 @@ export default function Sidebar() {
             children: [
                 '고라니', '너구리', '족제비'
             ],
-        }
+        },
     ]);
-    
-    const onClickMenuOpenState = (prev) => {
-        // setSideMenu({
-        //     ...prev, isOpen: !(prev.isOpen)
-        // });
-    }
 
+    useEffect(()=> {
+        for(let i=0; i<sideMenu.length; i++) {
+            listRef.current[i].style.maxHeight = '0';
+        }
+    }, [])
+
+    // useMemo(() => {
+        
+    // }, [prod, user])
+
+    const onClickMenuOpenState = (i, e, menu) => {
+        // 리액트 배열 안 특정 객체 값 변경
+        let findIndex = sideMenu.findIndex((item) => item.name === e.target.title);
+        let copiedMenu = [...sideMenu];
+
+        const style = listRef.current[i].style;
+
+        if(copiedMenu[findIndex].isOpen) {
+            console.log(copiedMenu[findIndex].isOpen);
+            style.maxHeight = '0';
+        } else if (!copiedMenu[findIndex].isOpen) {
+            style.maxHeight =  `${listRef.current[i].scrollHeight}px`;
+        }
+
+        copiedMenu[findIndex].isOpen = !menu.isOpen;
+        setSideMenu(copiedMenu);
+    };
+      
     return (
         <S.SidebarContainer>
-            {sideMenu.map((menu)=>(
+            {sideMenu.map((menu, i)=>(
                 <S.MenuItemSection>
                     <S.MenuTitleFlex>
                         <S.MenuTitle>{menu.name}</S.MenuTitle>
-                        <S.MenuOpenState>{menu.isOpen ? '닫기' : '열기'}</S.MenuOpenState>
+                        <S.MenuOpenState title={menu.name} onClick={(e)=>onClickMenuOpenState(i, e, menu)}>{menu.isOpen ? 'close' : 'open'}</S.MenuOpenState>
                     </S.MenuTitleFlex>
-                    {menu.children.map((item)=>(
-                        <S.MenuItem><S.MenuItemLink to={`${menu.path}/${item}`}>{item}</S.MenuItemLink></S.MenuItem>
-                    ))}
+                    <S.MenuItemUl isOpen={menu.isOpen} ref={(element) => listRef.current[i] = element}>
+                        {menu.children.map((item)=>(
+                            <S.MenuItemLink to={`${menu.path}/${item}`}>
+                                <S.MenuItem 
+                                    key={item.name}
+                                    style={{
+                                    // "background-color": item === prod || item === user ? 'beige' : 'none',
+                                    boxShadow: item === prod || item === user ? "5px 5px 5px gray" : 'none',
+                                }}>
+                                    {item}
+                                </S.MenuItem>
+                            </S.MenuItemLink>
+                        ))}
+                    </S.MenuItemUl>
                 </S.MenuItemSection>
             ))}
         </S.SidebarContainer>
@@ -69,17 +104,20 @@ const MenuTitleFlex = styled.div`
 
 const MenuTitle = styled.div`
     color: darkblue;
-    /* border: solid 1px gray; */
 `;
 
-const MenuOpenState = styled.div`
+const MenuOpenState = styled.button`
     font-size: 1rem;
+`;
+
+const MenuItemUl = styled.ul`
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
 `;
 
 const MenuItem = styled.li`
     list-style: none;
     padding: 10px 0 10px 10px;
-    height: 15px;
     font-size: 1rem;
     &:hover {
         font-weight: bold;
@@ -98,6 +136,7 @@ const S ={
     MenuTitleFlex,
     MenuTitle,
     MenuOpenState,
+    MenuItemUl,
     MenuItem,
     MenuItemLink
 }
