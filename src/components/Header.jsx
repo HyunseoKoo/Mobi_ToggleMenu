@@ -5,8 +5,8 @@ import styled from 'styled-components';
 export default function Header() {
     const navigate = useNavigate();
     return (
-        <S.HeaderContainer onClick={()=>navigate('/')}>
-            MENU-TOGGLE
+        <S.HeaderContainer>
+            <div onClick={()=>navigate('/')}>MENU-TOGGLE</div>
         </S.HeaderContainer>
     );
 }
@@ -14,14 +14,16 @@ export default function Header() {
 const HeaderContainer = styled.header`
     padding: 5px;
     width: 100%;
-    height: 30px;
-    background-color: pink;
+    height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
     font-size: 1.5rem;
-    cursor: pointer;
+    border-bottom: solid 1px #eaeaea;
+    & > div {
+        cursor: pointer;
+    }
 `;
 
 const S = {
