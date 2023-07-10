@@ -1,1 +1,13 @@
-<img width="1074" alt="image" src="https://github.com/HyunseoKoo/Mobi_ToggleMenu/assets/117560047/eb3fc52e-d7c7-49ba-b52d-a6afd736553f">
+# 토글 메뉴바 만들기
+## 반복되는 UI를 object로 표현
+
+https://github.com/HyunseoKoo/Mobi_ToggleMenu/assets/117560047/0ff3232a-6d28-47e9-9790-a8d21ec526d1
+
+### 구현 기능
+1. 상위메뉴 클릭 시, 하위메뉴가 슬라이드로 열림
+
+2. 하위메뉴 클릭 시, 선택된 하위 메뉴만 활성화
+
+3. 뒤로가기 기능 지원
+
+4. 새로고침 시 해당 페이지의 토글 메뉴 오픈 활성화
