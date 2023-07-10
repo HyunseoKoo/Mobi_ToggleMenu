@@ -1,86 +1,58 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { styled } from 'styled-components';
+import { mockMenu } from '../consts/MenuList';
 
 export default function Sidebar() {
     const listRef = useRef({});
+
     const location = useLocation();
 	const PathNameArr = location.pathname.split('/');
 	const currentMenu = PathNameArr[1];
-    const {prod, user} = useParams();
-    const [sideMenu, setSideMenu] = useState([
-        {
-            name: 'product',
-            path: '/product',
-            isOpen: false,
-            children: [
-                '과일', '채소', '잡곡'
-            ],
-        },
-        {
-            name: 'signUp',
-            path: '/signUp',
-            isOpen: false,
-            children: [
-                '회원가입', '개인정보 수정', '비밀번호 변경'
-            ],
-        },
-    ]);
 
+    const {prod, user} = useParams();
+    const [sideMenu, setSideMenu] = useState(mockMenu);
+
+    
+    
     useEffect(()=> {
         for(let i=0; i<sideMenu.length; i++) {
+            // 마운트 됐을 때 모든 메뉴의 토글이 닫혀있도록 하기 위함
             listRef.current[i].style.maxHeight = '0';
-        
-            // 추가기능 : [product] 메뉴의 하위 탭을 클릭하면 [sign up] 메뉴 토글이 닫히는 로직
+
+            // 추가기능 : [product] 메뉴의 하위 탭을 클릭하면 [sign up] 메뉴 토글이 닫히고, [product] 메뉴 클릭버튼이 close로 바뀌는 로직
             if(sideMenu[i].isOpen === true) {
-                listRef.current[i].style.maxHeight = '0';
                 let copiedMenu = [...sideMenu];
                 copiedMenu[i].isOpen = false;
                 setSideMenu(copiedMenu);
             }
         }
+
+        // 메뉴 탭이 변경될 때마다 해당 탭의 메뉴가 슬라이드로 내려오도록 하기 위함
+        const newButtonStateMenu = sideMenu.map((menu, idx) => {
+            if(menu.children.includes(prod || user)) {
+                listRef.current[idx].style.maxHeight =  `${listRef.current[idx].scrollHeight}px`;
+                return {...menu, isOpen: true}
+            }
+            return menu;
+        })
+        setSideMenu(newButtonStateMenu)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentMenu]);
 
-    useEffect(()=> {
-        for(let i=0; i<sideMenu.length; i++) {
-            if(sideMenu[i].children.includes(prod || user)) {
-                const style = listRef.current[i].style;
-                style.maxHeight =  `${listRef.current[i].scrollHeight}px`;
-
-                let copiedMenu = [...sideMenu];
-                copiedMenu[i].isOpen = true;
-                setSideMenu(copiedMenu);
-            }
-        }
-        // 리팩터링 시도 중
-        // const newButtonStateMenu = sideMenu.map((item, idx) => {
-        //     if(item.children.includes(prod || user)) {
-        //         const style = listRef.current[idx].style;
-        //         style.maxHeight =  `${listRef.current[idx].scrollHeight}px`;
-        //         return {...item, isOpen: true}
-        //     }
-        //     return { ...item, isOpen: false}
-        // })
-        // setSideMenu(newButtonStateMenu)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [prod, user]);
-
-    const onClickMenuOpenState = (i, e, menu) => {
+    const onClickMenuOpenState = (idx, e, menu) => {
         let findIndex = sideMenu.findIndex((item) => item.name === e.target.title);
         let copiedMenu = [...sideMenu];
-
-        const style = listRef.current[i].style;
+        const style = listRef.current[idx].style;
 
         if(copiedMenu[findIndex].isOpen) {
             style.maxHeight = '0';
         } else if (!copiedMenu[findIndex].isOpen) {
-            style.maxHeight =  `${listRef.current[i].scrollHeight}px`;
+            style.maxHeight =  `${listRef.current[idx].scrollHeight}px`;
         }
 
         copiedMenu[findIndex].isOpen = !menu.isOpen;
         setSideMenu(copiedMenu);
-        
     };
       
     return (
@@ -160,7 +132,7 @@ const MenuItem = styled.li`
 		currentMenu ? 'black' : 'none'};
     &:hover {
         font-weight: bold;
-        color: red;
+        color: hotpink;
     }
 `;
 
